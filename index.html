@@ -3,63 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedBRAIN AI - Medical Assistant</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MedBRAIN AI - Modern Medical Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --dark-amethyst: #10002bff;
+            --dark-amethyst-2: #240046ff;
+            --indigo-ink: #3c096cff;
+            --indigo-velvet: #5a189aff;
+            --royal-violet: #7b2cbfff;
+            --lavender-purple: #9d4eddff;
+            --mauve-magic: #c77dffff;
+            --mauve: #e0aaffff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-amethyst) 0%, var(--indigo-ink) 50%, var(--royal-violet) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(90deg, var(--royal-violet), var(--lavender-purple));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 15px;
+            word-wrap: break-word;
+        }
+        
+        .message.bot .message-content {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-amethyst);
+        }
+        
+        .message.user .message-content {
+            background: var(--lavender-purple);
+            color: white;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            width: fit-content;
+        }
+        
+        .typing-indicator.show {
+            display: block;
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--royal-violet);
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--mauve-magic);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-amethyst);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        #userInput:focus {
+            border-color: var(--lavender-purple);
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+        }
+        
+        #sendBtn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--royal-violet), var(--lavender-purple));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4);
+        }
+        
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .suggestions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .suggestion-pill {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--mauve);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .suggestion-pill:hover {
+            background: var(--lavender-purple);
+            transform: translateY(-2px);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--lavender-purple);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--royal-violet);
+        }
+    </style>
 </head>
 <body>
-    <!-- Minimal Header with Navigation -->
-    <header>
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-brain"></i>
-                <h1>MedBRAIN AI</h1>
-            </div>
-            <nav>
-                <a href="index.html">Chat</a>
-                <a href="about.html">About</a>
-                <a href="features.html">Features</a>
-                <button id="clearChatBtn" class="clear-chat-btn" title="Clear conversation">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </nav>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🧠 MedBRAIN AI</h1>
+            <p>Your Intelligent Medical Assistant</p>
         </div>
-    </header>
-
-    <!-- Main Chat Interface (Full Screen) -->
-    <main class="chat-main">
-        <div class="chat-container">
-            <!-- Chat Messages Area -->
-            <div id="chatMessages" class="chat-messages"></div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content">
+                    👋 Welcome! I'm MedBRAIN AI, your medical assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span><span></span><span></span>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="suggestions">
+                <div class="suggestion-pill" onclick="sendSuggestion('What are the symptoms of diabetes?')">Symptoms of diabetes</div>
+                <div class="suggestion-pill" onclick="sendSuggestion('How to manage high blood pressure?')">Blood pressure tips</div>
+                <div class="suggestion-pill" onclick="sendSuggestion('Common causes of headaches')">Headache causes</div>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Ask me about medical topics..." />
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'https://amalsp-medbrain-ai.hf.space/chat';
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        function sendSuggestion(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+        
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
             
-            <!-- Input Area (Fixed at Bottom) -->
-            <div class="chat-input-container">
-
+            addMessage(message, 'user');
+            userInput.value = '';
+            sendBtn.disabled = true;
+            typingIndicator.classList.add('show');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
                 
-                <div class="chat-input">
-                    <div class="input-wrapper">
-                        <input type="text" id="userInput" placeholder="Ask me about medical topics (for education only)..." maxlength="500">
-                        <button id="voiceBtn" class="voice-btn" title="Voice Input">
-                            <i class="fas fa-microphone"></i>
-                        </button>
-                    </div>
-                                                        <button id="sendBtn" onclick="sendMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 MedBRAIN AI. For educational purposes only. Not a substitute for professional medical advice.</p>
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="https://github.com/amalsp220/MedBRAIN-AI-Frontend" target="_blank">GitHub</a>
-        </div>
-    </footer>
-
-    <script src="app.js"></script>
+                const data = await response.json();
+                typingIndicator.classList.remove('show');
+                addMessage(data.response || 'Sorry, I encountered an error.', 'bot');
+            } catch (error) {
+                typingIndicator.classList.remove('show');
+                addMessage('Sorry, I am unable to connect. Please try again.', 'bot');
+            }
+            
+            sendBtn.disabled = false;
+        }
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
 </body>
 </html>
