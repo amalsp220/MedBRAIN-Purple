@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedBRAIN AI - Your Medical Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-amethyst: #10002b;
+            --dark-amethyst-2: #240046;
+            --indigo-ink: #3c096c;
+            --indigo-velvet: #5a189a;
+            --royal-violet: #7b2cbf;
+            --lavender-purple: #9d4edd;
+            --mauve-magic: #c77dff;
+            --mauve: #e0aaff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-amethyst) 0%, var(--indigo-ink) 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(93, 24, 154, 0.3);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .brain-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--mauve-magic), var(--lavender-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px var(--mauve-magic));
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--mauve), var(--mauve-magic));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--mauve);
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+        
+        .chat-container {
+            flex: 1;
+            background: rgba(36, 0, 70, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--indigo-velvet);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .user-message .avatar {
+            background: linear-gradient(135deg, var(--royal-violet), var(--lavender-purple));
+        }
+        
+        .ai-message .avatar {
+            background: linear-gradient(135deg, var(--mauve-magic), var(--mauve));
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.6;
+        }
+        
+        .user-message .message-content {
+            background: linear-gradient(135deg, var(--royal-violet), var(--indigo-velvet));
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message .message-content {
+            background: rgba(157, 78, 221, 0.2);
+            border: 1px solid var(--lavender-purple);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .typing {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+        }
+        
+        .typing span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--mauve-magic);
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        .input-area {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--indigo-velvet);
+            background: rgba(36, 0, 70, 0.7);
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: var(--lavender-purple);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+        }
+        
+        input::placeholder {
+            color: var(--mauve);
+        }
+        
+        button {
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(135deg, var(--royal-violet), var(--lavender-purple));
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .suggestion-chip {
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: rgba(93, 24, 154, 0.3);
+            border: 1px solid var(--indigo-velvet);
+            color: var(--mauve);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .suggestion-chip:hover {
+            background: rgba(157, 78, 221, 0.4);
+            border-color: var(--lavender-purple);
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: var(--mauve);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .message-content { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-brain brain-icon"></i>
+                <div>
+                    <h1>MedBRAIN AI</h1>
+                    <p class="subtitle">Your Intelligent Medical Assistant</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="chat-container">
+            <div class="suggestions" id="suggestions">
+                <div class="suggestion-chip" onclick="sendSuggestion(this)">What are the symptoms of diabetes?</div>
+                <div class="suggestion-chip" onclick="sendSuggestion(this)">How can I manage high blood pressure?</div>
+                <div class="suggestion-chip" onclick="sendSuggestion(this)">What causes headaches?</div>
+                <div class="suggestion-chip" onclick="sendSuggestion(this)">Explain the difference between bacteria and viruses</div>
+            </div>
+            
+            <div class="messages" id="messages"></div>
+            
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Ask me about medical topics..." maxlength="500">
+                <button id="sendBtn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>⚠️ For educational purposes only. Always consult healthcare professionals.</p>
+        </footer>
+    </div>
+    
+    <script>
+        const API_BASE = 'https://amalsp-medbrain-ai.hf.space';
+        const messages = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const suggestions = document.getElementById('suggestions');
+        let conversationHistory = [];
+        
+        function addMessage(text, isUser) {
+            const msg = document.createElement('div');
+            msg.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            msg.innerHTML = `
+                <div class="avatar">
+                    <i class="fas fa-${isUser ? 'user' : 'brain'}"></i>
+                </div>
+                <div class="message-content">${text}</div>
+            `;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function showTyping() {
+            const typing = document.createElement('div');
+            typing.className = 'message ai-message';
+            typing.id = 'typing';
+            typing.innerHTML = `
+                <div class="avatar"><i class="fas fa-brain"></i></div>
+                <div class="typing"><span></span><span></span><span></span></div>
+            `;
+            messages.appendChild(typing);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function removeTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+        
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            
+            suggestions.style.display = 'none';
+            addMessage(text, true);
+            conversationHistory.push({role: 'user', content: text});
+            userInput.value = '';
+            sendBtn.disabled = true;
+            showTyping();
+            
+            try {
+                const response = await fetch(`${API_BASE}/gradio_api/call/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({data: [text, conversationHistory]})
+                });
+                
+                const callData = await response.json();
+                const eventSource = new EventSource(`${API_BASE}/gradio_api/call/chat/${callData.event_id}`);
+                
+                eventSource.addEventListener('complete', (event) => {
+                    const data = JSON.parse(event.data);
+                    removeTyping();
+                    addMessage(data[0], false);
+                    conversationHistory.push({role: 'assistant', content: data[0]});
+                    eventSource.close();
+                    sendBtn.disabled = false;
+                });
+                
+                eventSource.addEventListener('error', () => {
+                    removeTyping();
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                    eventSource.close();
+                    sendBtn.disabled = false;
+                });
+            } catch (error) {
+                removeTyping();
+                addMessage('Connection error. Please check your internet and try again.', false);
+                sendBtn.disabled = false;
+            }
+        }
+        
+        function sendSuggestion(el) {
+            userInput.value = el.textContent;
+            sendMessage();
+        }
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
