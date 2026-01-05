@@ -291,9 +291,11 @@
                 });
                 
                 const data = await response.json();
+                            console.log('API Response:', data);
                 typingIndicator.classList.remove('show');
                                 addMessage(data.data?.[0] || 'Sorry, I encountered an error.', 'bot');
             } catch (error) {
+                            console.error('API Error:', error);
                 typingIndicator.classList.remove('show');
                 addMessage('Sorry, I am unable to connect. Please try again.', 'bot');
             }
@@ -310,4 +312,75 @@
         }
     </script>
 </body>
+
+        <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@1.0.0/+esm";
+        
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        
+        let gradioClient = null;
+        
+        // Initialize Gradio client
+        async function initClient() {
+            try {
+                gradioClient = await Client.connect("amalsp/MedBRAIN-AI");
+                console.log('Gradio client connected successfully');
+            } catch (error) {
+                console.error('Failed to connect to Gradio:', error);
+            }
+        }
+        
+        // Initialize on page load
+        initClient();
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        window.sendSuggestion = function(text) {
+            userInput.value = text;
+            sendMessage();
+        };
+        
+        window.sendMessage = async function() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            userInput.value = '';
+            sendBtn.disabled = true;
+            typingIndicator.classList.add('show');
+            
+            try {
+                if (!gradioClient) {
+                    await initClient();
+                }
+                
+                const result = await gradioClient.predict("/chat", {
+                    message: message
+                });
+                
+                typingIndicator.classList.remove('show');
+                const response = result.data || 'Sorry, I encountered an error.';
+                addMessage(response, 'bot');
+            } catch (error) {
+                console.error('Chat error:', error);
+                typingIndicator.classList.remove('show');
+                addMessage('Sorry, I am unable to connect. Please try again.', 'bot');
+            }
+            
+            sendBtn.disabled = false;
+        };
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
 </html>
