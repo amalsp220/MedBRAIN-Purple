@@ -263,7 +263,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
-        const typingIndicator = document.getElementById('typingIndicator');
+                
         
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
@@ -287,12 +287,12 @@
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                                        body: JSON.stringify({ data: [message] })
                 });
                 
                 const data = await response.json();
                 typingIndicator.classList.remove('show');
-                addMessage(data.response || 'Sorry, I encountered an error.', 'bot');
+                                addMessage(data.data?.[0] || 'Sorry, I encountered an error.', 'bot');
             } catch (error) {
                 typingIndicator.classList.remove('show');
                 addMessage('Sorry, I am unable to connect. Please try again.', 'bot');
